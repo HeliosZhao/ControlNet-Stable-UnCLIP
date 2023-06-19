@@ -1,0 +1,80 @@
+pretrained_model_name_or_path: "checkpoints/stable-diffusion-2-1-unclip-small"
+controlnet_model_name_or_path: null
+revision: null
+tokenizer_name: null
+resume_from_checkpoint: null
+seed: 33
+output_dir: "outputs/controlnet-coco-unclip-small-openposefull"
+
+## data
+cache_dir: null ## default is ~/.cache/huggingface
+data_root: data/COCOText
+image_dir: train2017
+condition_dir: train2017_openposefull
+caption_file: train2017_blip2text.json
+file_list: person_list_train2017_new.txt
+anno_path: annotations/person_keypoints_train2017.json
+random_crop_prob: 0.2 ## the probability of random crop in the image
+dataloader_num_workers: 4 #
+
+
+## Train
+train_batch_size: 4
+gradient_accumulation_steps: 2
+resolution: 768
+num_train_epochs: 20
+max_train_steps: null
+proportion_empty_prompts: 0 # Proportion of image prompts to be replaced with empty strings
+noise_level: 0
+controlnet_image_embeds_type: empty ## using embeds for controlnet,  "image" for using
+
+
+## optimizer
+learning_rate: 1e-5
+scale_lr: false
+lr_scheduler: constant #  ["linear", "cosine", "cosine_with_restarts", "polynomial", "constant", "constant_with_warmup"]
+lr_warmup_steps: 500
+lr_num_cycles: 1
+lr_power: 1.0
+adam_beta1: 0.9
+adam_beta2: 0.999
+adam_weight_decay: 1e-2
+adam_epsilon: 1e-8
+max_grad_norm: 1.0
+
+validation_prompt: 
+  - "a man in a suit holding a pair of skis on the beach"
+  - "a man in a suit holding a pair of skis"
+
+validation_image:
+  - data/coco_val/000000052591_openposefull.jpg
+  - data/coco_val/000000052591_openposefull.jpg
+
+validation_image_embed:
+  - data/ikun.jpg
+  - data/xz.jpeg
+  
+num_validation_images: 4
+validation_steps: 500 #200
+
+
+## logging and checkpoints
+logging_dir: logs
+report_to: tensorboard #wandb
+tracker_project_name: train_controlnet_coco_unclip_small
+checkpointing_steps: 3000
+checkpoints_total_limit: null
+
+## efficient training
+gradient_checkpointing: true
+use_8bit_adam: false
+allow_tf32: false # Whether or not to allow TF32 on Ampere GPUs. Can be used to speed up training.
+mixed_precision: fp16 ## fp16
+enable_xformers_memory_efficient_attention: true
+set_grads_to_none: false # Save more memory by using setting grads to None instead of zero.
+
+## misc
+max_train_samples: null # For debugging purposes or quicker training, truncate the number of training examples to this 
+push_to_hub: false
+hub_token: null
+hub_model_id: null
